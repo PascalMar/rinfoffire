@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-player',
@@ -6,5 +6,14 @@ import { Component } from '@angular/core';
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent {
+
+  @Input() name: string = '';
+  @Input() playerActive: boolean = false;
+
+  constructor() { }
+
+  ngOnInit(): void {
+
+  }
 
 }
