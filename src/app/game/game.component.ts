@@ -20,18 +20,19 @@ export class GameComponent implements OnInit {
   }
 
   newGame() {
-    this.game = new Game();   
+    this.game = new Game();
   }
 
   takeCard() {
     if (!this.pickCardAnimation) {
-      this.currentCard = this.game.stack.pop() || '';    
-      this.pickCardAnimation = true;     
+      this.currentCard = this.game.stack.pop() || '';
+      this.pickCardAnimation = true;
       console.log('New card:' + this.currentCard);
       console.log('Game is', this.game);
-      
-      
 
+
+      this.game.currentPlayer++;
+      this.game.currentPlayer = this.game.currentPlayer % this.game.players.length;
       setTimeout(() => {
         this.game.playedCard.push(this.currentCard);
         this.pickCardAnimation = false;
@@ -43,7 +44,7 @@ export class GameComponent implements OnInit {
     const dialogRef = this.dialog.open(DialogAddPlayerComponent);
 
     dialogRef.afterClosed().subscribe((name: string) => {
-      this.game.players.push(name);    
+      this.game.players.push(name);
     });
   }
 
