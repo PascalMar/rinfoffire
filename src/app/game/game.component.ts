@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
 import { Firestore, addDoc, collection, collectionData, doc, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-game',
@@ -16,27 +17,30 @@ export class GameComponent implements OnInit {
   game: Game = new Game();
 
 
-  firestore: Firestore = inject(Firestore)
-  items$: Observable<any[]>;
-  coll: any;
+  // firestore: Firestore = inject(Firestore)
+  // items$: Observable<any[]>;
+  // coll: any;
 
-  constructor(public dialog: MatDialog) {
-    this.coll = collection(this.firestore, 'games')
-    this.items$ = collectionData(this.coll);
+  constructor(private route: ActivatedRoute, public dialog: MatDialog) {
+    // this.coll = collection(this.firestore, 'games')
+    // this.items$ = collectionData(this.coll);
 
-    this.items$.subscribe((game) => {
-      console.log('Game update', game);
+    // this.items$.subscribe((game) => {
+    //   console.log('Game update', game);
 
-    })
+    // })
   }
 
   ngOnInit(): void {
     this.newGame();
+    this.route.params.subscribe((params) => {
+      console.log(params);
+    });
   }
 
   async newGame() {
     this.game = new Game();
-    let gameInfo = await addDoc(this.coll, { game: this.game.toJson() });
+
 
   }
 
