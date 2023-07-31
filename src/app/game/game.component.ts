@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Game } from 'src/models/game';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
-import { Firestore, addDoc, collection, collectionData, doc, setDoc, docData } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, updateDoc, arrayUnion, onSnapshot } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
@@ -25,9 +25,6 @@ export class GameComponent implements OnInit {
   constructor(private route: ActivatedRoute, public dialog: MatDialog) {
     this.coll = collection(this.firestore, 'games')
     this.items$ = collectionData(this.coll);
-    this.items$.subscribe((game) => {
-
-    })
   }
 
   ngOnInit(): void {
@@ -35,6 +32,16 @@ export class GameComponent implements OnInit {
     this.route.params.subscribe((params) => {
       this.gameID = params['id'];
     });
+    onSnapshot(doc(this.coll, this.gameID), (doc) => {
+      const firestoreData = doc.data()
+      if (firestoreData) {
+        const firestoreGame = firestoreData['game'];
+        this.game.currentPlayer = firestoreGame.currentPlayer;
+        this.game.playedCard = firestoreGame.playedCard;
+        this.game.players = firestoreGame.players;
+        this.game.stack = firestoreGame.stack;
+      }
+    })
   }
 
   async newGame() {
@@ -70,14 +77,10 @@ export class GameComponent implements OnInit {
 
   saveGame() {
     if (this.gameID) {
-      const gameDocRef = doc(this.coll, this.gameID);
-      const gameData = {
-        currentPlayer: this.game.currentPlayer,
-        playedCard: this.game.playedCard,
-        players: this.game.players,
-        stack: this.game.stack
-      };
-      setDoc(gameDocRef, gameData)
+      const gameDocRef = doc(this.coll, this.gameID);    // Falsches Verständnis von der "gameDocRef" - updateDoc hat nicht in "game" aktualisiert, sondern ein neues Array angelegt
+      updateDoc(gameDocRef, {
+        "game.players": arrayUnion(...this.game.players)
+      });
     }
   }
 }
