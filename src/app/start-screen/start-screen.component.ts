@@ -23,10 +23,8 @@ export class StartScreenComponent {
 
   async newGame() {
     let game = new Game();
-    await addDoc(this.coll, { game: game.toJson() });
-    this.router.navigateByUrl('/game');
+    const docRef = await addDoc(this.coll, { game: game.toJson() });
+    this.router.navigate(['game', docRef.id]);
     console.log(game);
-
   }
-
 }

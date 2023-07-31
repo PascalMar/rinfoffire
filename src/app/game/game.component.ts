@@ -33,15 +33,14 @@ export class GameComponent implements OnInit {
   ngOnInit(): void {
     this.newGame();
     this.route.params.subscribe((params) => {
-
+      this.gameID = params['id'];
     });
   }
 
   async newGame() {
     this.game = new Game();
-
-
   }
+
 
   takeCard() {
     if (!this.pickCardAnimation) {
@@ -72,14 +71,13 @@ export class GameComponent implements OnInit {
   saveGame() {
     if (this.gameID) {
       const gameDocRef = doc(this.coll, this.gameID);
-      const gameData = {       
-        players: this.game.players        
-      };  
-      setDoc(gameDocRef, gameData).then(() => {
-        console.log('Daten erfolgreich aktualisiert!');
-      }).catch((error) => {
-        console.error('Fehler beim Aktualisieren der Daten:', error);
-      });
+      const gameData = {
+        currentPlayer: this.game.currentPlayer,
+        playedCard: this.game.playedCard,
+        players: this.game.players,
+        stack: this.game.stack
+      };
+      setDoc(gameDocRef, gameData)
     }
   }
 }
