@@ -12,8 +12,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnInit {
-  pickCardAnimation = false;
-  currentCard: string = '';
+
   game: Game = new Game();
   gameID: string = '';
 
@@ -40,6 +39,8 @@ export class GameComponent implements OnInit {
         this.game.playedCard = firestoreGame.playedCard;
         this.game.players = firestoreGame.players;
         this.game.stack = firestoreGame.stack;
+        this.game.currentCard = firestoreGame.currentCard;
+        this.game.pickCardAnimation = firestoreGame.pickCardAnimation;        
       }
     })
   }
@@ -50,17 +51,22 @@ export class GameComponent implements OnInit {
 
 
   takeCard() {
-    if (!this.pickCardAnimation) {
-      this.currentCard = this.game.stack.pop() || '';
-      this.pickCardAnimation = true;
+    if (!this.game.pickCardAnimation) {
+      this.game.currentCard = this.game.stack.pop() || '';
+      this.game.pickCardAnimation = true;
+    
 
 
       this.game.currentPlayer++;
       this.game.currentPlayer = this.game.currentPlayer % this.game.players.length;
+      this.updateDrawRelatedState();
       setTimeout(() => {
-        this.game.playedCard.push(this.currentCard);
-        this.pickCardAnimation = false;
+        this.game.playedCard.push(this.game.currentCard);        
+        this.game.pickCardAnimation = false;
+        this.updateDrawRelatedState();
       }, 1000);
+      console.log('current card is:', this.game.currentCard);
+      
     }
   }
 
@@ -70,16 +76,31 @@ export class GameComponent implements OnInit {
     dialogRef.afterClosed().subscribe((name: string) => {
       if (name && name.length > 0) {
         this.game.players.push(name);
-        this.saveGame();
+        this.savePlayer();
       }
     });
   }
 
-  saveGame() {
+  savePlayer() {
     if (this.gameID) {
       const gameDocRef = doc(this.coll, this.gameID);    // Falsches Verständnis von der "gameDocRef" - updateDoc hat nicht in "game" aktualisiert, sondern ein neues Array angelegt
       updateDoc(gameDocRef, {
         "game.players": arrayUnion(...this.game.players)
+      });
+    }
+  }
+
+
+
+  updateDrawRelatedState() {
+    if (this.gameID) {
+      const gameDocRef = doc(this.coll, this.gameID);
+      updateDoc(gameDocRef, {
+        "game.currentCard": this.game.currentCard,
+        "game.pickCardAnimation": this.game.pickCardAnimation,
+        "game.stack": this.game.stack,
+        "game.playedCard": this.game.playedCard,
+        "game.currentPlayer": this.game.currentPlayer
       });
     }
   }
