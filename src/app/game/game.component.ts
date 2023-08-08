@@ -57,9 +57,6 @@ export class GameComponent implements OnInit {
     if (!this.game.pickCardAnimation) {
       this.game.currentCard = this.game.stack.pop() || '';
       this.game.pickCardAnimation = true;
-
-
-
       this.game.currentPlayer++;
       this.game.currentPlayer = this.game.currentPlayer % this.game.players.length;
       this.updateDrawRelatedState();
@@ -74,14 +71,18 @@ export class GameComponent implements OnInit {
   }
 
   editPlayer(playerId: number) {
-
     const dialogRef = this.dialog.open(EditPlayerComponent);
-
     dialogRef.afterClosed().subscribe((change: string) => {
-      console.log('received change', change);
-      this.game.player_images[playerId] = change;
-      this.updateDrawRelatedState();
-
+      if (change) {
+        if (change == 'DELETE') {
+          this.game.players.splice(playerId, 1);
+          // this.game.player_images.splice(playerId, 1);          
+        } else {
+          console.log('received change', change);
+          this.game.player_images[playerId] = change;
+        }
+        this.updateDrawRelatedState();
+      }
     });
   }
 
