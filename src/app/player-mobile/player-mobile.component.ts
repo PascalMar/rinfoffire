@@ -7,5 +7,6 @@ import { Component, Input } from '@angular/core';
 })
 export class PlayerMobileComponent {
   @Input() name: string = '';
+  @Input() image: string = '1.webp';
   @Input() playerActive: boolean = false;
 }
